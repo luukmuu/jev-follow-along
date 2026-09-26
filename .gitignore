@@ -1,0 +1,5 @@
+node_modules/
+.env
+projects/03-youtube/data/*.json
+!projects/03-youtube/data/channels.example.json
+.DS_Store

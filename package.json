@@ -1,0 +1,27 @@
+{
+  "name": "jev-follow-along",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Follow-along code for the 'Jev: The New AI Model' tutorial — three projects built on TypeSafe's Jev decision model.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check-setup.js",
+    "voice": "node projects/01-voice-browser/server.js",
+    "memory": "node projects/02-memory/server.js",
+    "youtube:sample": "node projects/03-youtube/make-sample-data.js",
+    "youtube:fetch": "node projects/03-youtube/fetch-youtube.js",
+    "youtube:train": "node projects/03-youtube/train.js",
+    "youtube": "node projects/03-youtube/server.js",
+    "test": "JEV_MOCK=1 node --test test/"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "playwright": "^1.63.0"
+  }
+}
