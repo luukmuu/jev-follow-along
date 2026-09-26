@@ -42,7 +42,7 @@ million input tokens, output free, 32K context).
 const client = new TypeSafeClient({
   apiKey: process.env.OPENROUTER_API_KEY,     // sk-or-…
   baseURL: "https://openrouter.ai/api",
-  defaultModel: "typesafe/jev-1.13",          // some docs write "jev-1.13"
+  defaultModel: "typesafe/jev-1.13",          // confirmed working; responds as typesafe/jev-1.13-20260917
 });
 ```
 
