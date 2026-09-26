@@ -36,7 +36,7 @@ export const SITES = {
 
 // The if-statement thresholds. Tune these while watching the dashboard log.
 export const THRESHOLDS = {
-  isCommand: 0.5, // below: the user is talking to someone else → ignore
+  isCommand: 0.7, // below: the user is talking to someone else → ignore
   complete: 0.6, // below: sentence not finished yet → wait for more words
   intent: 0.35, // below: not sure what they want → ignore
   target: 0.25, // below: not sure which element → ask to clarify

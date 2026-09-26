@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Browser Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 20px;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 250px;
+      gap: 20px;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .header {
+      background: #2a2a2a;
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .badge {
+      background: #4a90e2;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .page-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .page-title {
+      font-weight: 600;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .page-url {
+      color: #888;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls {
+      background: #2a2a2a;
+      padding: 15px 20px;
+      border-radius: 8px;
+    }
+
+    .control-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .mic-btn {
+      background: #4a90e2;
+      color: white;
+      min-width: 120px;
+    }
+
+    .mic-btn.active {
+      background: #e24a4a;
+    }
+
+    .send-btn {
+      background: #4a90e2;
+      color: white;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 8px 12px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 14px;
+    }
+
+    .notice {
+      background: #4a4a2a;
+      color: #ffd700;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .transcript {
+      background: #2a2a2a;
+      padding: 15px 20px;
+      border-radius: 8px;
+      min-height: 50px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .transcript.interim {
+      color: #888;
+    }
+
+    .transcript.final {
+      color: #e0e0e0;
+    }
+
+    .confirm-banner {
+      background: #6a4a8a;
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-weight: 600;
+    }
+
+    .confirm-banner .message {
+      flex: 1;
+    }
+
+    .confirm-btn {
+      background: #4ae24a;
+      color: #1a1a1a;
+    }
+
+    .cancel-btn {
+      background: #666;
+      color: white;
+    }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .log-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .skipped-count {
+      color: #666;
+      font-size: 12px;
+    }
+
+    .log {
+      background: #2a2a2a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .log-row {
+      border-bottom: 1px solid #1a1a1a;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .log-row:hover {
+      background: #333;
+    }
+
+    .log-row.expanded {
+      background: #333;
+    }
+
+    .log-main {
+      display: grid;
+      grid-template-columns: 80px 1fr 100px 1fr 80px;
+      gap: 15px;
+      padding: 12px 20px;
+      align-items: center;
+    }
+
+    .log-time {
+      color: #666;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .log-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .log-action {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .log-row.execute .log-action { color: #4ae24a; }
+    .log-row.wait .log-action { color: #888; }
+    .log-row.ignore .log-action { color: #666; }
+    .log-row.clarify .log-action { color: #e2a24a; }
+    .log-row.confirm .log-action { color: #a24ae2; }
+    .log-row.error .log-action { color: #e24a4a; }
+
+    .log-reason {
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .log-latency {
+      color: #666;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .log-details {
+      padding: 0 20px 15px 20px;
+      background: #252525;
+    }
+
+    .prob-group {
+      margin-bottom: 15px;
+    }
+
+    .prob-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .prob-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .prob-bar-wrapper {
+      position: relative;
+      height: 24px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .prob-bar {
+      height: 100%;
+      background: #4a90e2;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .prob-threshold {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e2a24a;
+      z-index: 1;
+    }
+
+    .prob-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prob-choice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .prob-choice-label {
+      min-width: 100px;
+      color: #aaa;
+    }
+
+    .prob-choice.selected .prob-choice-label {
+      color: #4ae24a;
+      font-weight: 600;
+    }
+
+    .sidebar {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .sidebar h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .threshold-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 12px;
+    }
+
+    .threshold-item:last-child {
+      border-bottom: none;
+    }
+
+    .threshold-key {
+      color: #aaa;
+    }
+
+    .threshold-value {
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      color: #4a90e2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+      <div class="header">
+        <div class="badge" id="mode-badge">Loading...</div>
+        <div class="page-info">
+          <div class="page-title" id="page-title">Loading...</div>
+          <div class="page-url" id="page-url"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div id="notice" class="notice" style="display: none;">
+          Voice needs Google Chrome. Typing still works.
+        </div>
+        <div class="control-row">
+          <button id="mic-btn" class="mic-btn">Start mic</button>
+        </div>
+        <div class="control-row">
+          <input type="text" id="text-input" placeholder="Type a command...">
+          <button id="send-btn" class="send-btn">Send</button>
+        </div>
+      </div>
+
+      <div class="transcript" id="transcript">Waiting for input...</div>
+
+      <div id="confirm-banner" class="confirm-banner" style="display: none;">
+        <div class="message">Confirm destructive action?</div>
+        <button class="confirm-btn" onclick="confirmAction()">Confirm</button>
+        <button class="cancel-btn" onclick="cancelConfirm()">Cancel</button>
+      </div>
+
+      <div class="log-header">
+        <h2>Log</h2>
+        <div class="skipped-count" id="skipped-count">skipped: 0</div>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="sidebar">
+      <h3>Thresholds</h3>
+      <div id="thresholds"></div>
+    </div>
+  </div>
+
+  <script>
+    const sessionId = Math.random().toString(36).substring(2, 15);
+    let resultIndex = 0;
+    let recognition = null;
+    let micActive = false;
+    let skippedCount = 0;
+    let currentStatus = null;
+    const logEntries = new Map(); // utteranceId -> entry element
+
+    // Check for Speech API support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      document.getElementById('notice').style.display = 'block';
+      document.getElementById('mic-btn').disabled = true;
+    }
+
+    // Initialize
+    loadStatus();
+
+    // Mic control
+    document.getElementById('mic-btn').addEventListener('click', () => {
+      if (micActive) {
+        stopMic();
+      } else {
+        startMic();
+      }
+    });
+
+    function startMic() {
+      if (!SpeechRecognition) return;
+
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        micActive = true;
+        document.getElementById('mic-btn').textContent = 'Stop mic';
+        document.getElementById('mic-btn').classList.add('active');
+      };
+
+      recognition.onend = () => {
+        // Restart if mic should still be on
+        if (micActive) {
+          recognition.start();
+        }
+      };
+
+      recognition.onresult = (event) => {
+        const result = event.results[event.resultIndex];
+        const text = result[0].transcript;
+        const isFinal = result.isFinal;
+        const utteranceId = `${sessionId}-${event.resultIndex}`;
+        const seq = event.results.length;
+
+        // Update transcript display
+        const transcriptEl = document.getElementById('transcript');
+        transcriptEl.textContent = text;
+        transcriptEl.className = `transcript ${isFinal ? 'final' : 'interim'}`;
+
+        // Send to server
+        sendUtterance(utteranceId, seq, text, isFinal);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+      };
+
+      recognition.start();
+    }
+
+    function stopMic() {
+      micActive = false;
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+      }
+      document.getElementById('mic-btn').textContent = 'Start mic';
+      document.getElementById('mic-btn').classList.remove('active');
+    }
+
+    // Text input
+    document.getElementById('send-btn').addEventListener('click', sendTextInput);
+    document.getElementById('text-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendTextInput();
+      }
+    });
+
+    function sendTextInput() {
+      const input = document.getElementById('text-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const utteranceId = `${sessionId}-text-${Date.now()}`;
+      const seq = 1;
+
+      // Update transcript display
+      const transcriptEl = document.getElementById('transcript');
+      transcriptEl.textContent = text;
+      transcriptEl.className = 'transcript final';
+
+      sendUtterance(utteranceId, seq, text, true);
+      input.value = '';
+    }
+
+    async function sendUtterance(utteranceId, seq, text, isFinal) {
+      try {
+        const response = await fetch('/api/utterance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ utteranceId, seq, text, isFinal })
+        });
+
+        const data = await response.json();
+
+        // Skip "done" and "stale" from log
+        if (data.action === 'done' || data.action === 'stale') {
+          skippedCount++;
+          document.getElementById('skipped-count').textContent = `skipped: ${skippedCount}`;
+          return;
+        }
+
+        // Update log
+        addLogEntry(utteranceId, text, data);
+
+        // Show confirm banner if needed
+        if (data.action === 'confirm') {
+          document.getElementById('confirm-banner').style.display = 'flex';
+        }
+
+        // Refresh status after execute
+        if (data.action === 'execute') {
+          setTimeout(loadStatus, 100);
+        }
+      } catch (err) {
+        console.error('Failed to send utterance:', err);
+      }
+    }
+
+    function addLogEntry(utteranceId, text, data) {
+      const logEl = document.getElementById('log');
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+
+      // For interim "wait" actions, update existing row
+      if (data.action === 'wait' && logEntries.has(utteranceId)) {
+        const existingRow = logEntries.get(utteranceId);
+        const reasonEl = existingRow.querySelector('.log-reason');
+        if (reasonEl) {
+          reasonEl.textContent = data.reason;
+        }
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = `log-row ${data.action}`;
+      row.innerHTML = `
+        <div class="log-main">
+          <div class="log-time">${time}</div>
+          <div class="log-text">${text}</div>
+          <div class="log-action">${data.action}</div>
+          <div class="log-reason">${data.reason || ''}</div>
+          <div class="log-latency">${data.latencyMs || 0}ms</div>
+        </div>
+        <div class="log-details" style="display: none;"></div>
+      `;
+
+      row.addEventListener('click', () => {
+        const detailsEl = row.querySelector('.log-details');
+        const isExpanded = row.classList.contains('expanded');
+
+        if (isExpanded) {
+          row.classList.remove('expanded');
+          detailsEl.style.display = 'none';
+        } else {
+          row.classList.add('expanded');
+          detailsEl.style.display = 'block';
+          if (detailsEl.innerHTML === '') {
+            renderDetails(detailsEl, data.answers);
+          }
+        }
+      });
+
+      // Insert at top
+      logEl.insertBefore(row, logEl.firstChild);
+      logEntries.set(utteranceId, row);
+    }
+
+    function renderDetails(container, answers) {
+      if (!answers) {
+        container.innerHTML = '<div style="color: #666; font-size: 12px;">No details available</div>';
+        return;
+      }
+
+      let html = '';
+
+      // Render noul questions (is_command, complete, destructive)
+      for (const [key, value] of Object.entries(answers)) {
+        if (value.noul !== undefined) {
+          const threshold = currentStatus?.thresholds?.[key] || 0.5;
+          html += `
+            <div class="prob-group">
+              <div class="prob-label">${key.replace(/_/g, ' ')}</div>
+              <div class="prob-bar-wrapper">
+                <div class="prob-threshold" style="left: ${threshold * 100}%"></div>
+                <div class="prob-bar" style="width: ${value.noul * 100}%">
+                  ${Math.round(value.noul * 100)}%
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // Render choice questions (intent, target, site)
+      for (const [key, value] of Object.entries(answers)) {
+        if (value.choice !== undefined) {
+          const threshold = currentStatus?.thresholds?.[key] || 0.5;
+          html += `
+            <div class="prob-group">
+              <div class="prob-label">${key.replace(/_/g, ' ')}</div>
+              <div class="prob-choices">
+          `;
+
+          if (value.top3) {
+            for (const [label, prob] of value.top3) {
+              const isSelected = label === value.choice;
+              html += `
+                <div class="prob-choice ${isSelected ? 'selected' : ''}">
+                  <div class="prob-choice-label">${label}</div>
+                  <div class="prob-bar-wrapper" style="flex: 1;">
+                    ${isSelected ? `<div class="prob-threshold" style="left: ${threshold * 100}%"></div>` : ''}
+                    <div class="prob-bar" style="width: ${prob * 100}%">
+                      ${Math.round(prob * 100)}%
+                    </div>
+                  </div>
+                </div>
+              `;
+            }
+          }
+
+          html += `
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      container.innerHTML = html;
+    }
+
+    async function loadStatus() {
+      try {
+        const response = await fetch('/api/status');
+        currentStatus = await response.json();
+
+        document.getElementById('mode-badge').textContent = currentStatus.mode;
+        document.getElementById('page-title').textContent = currentStatus.title;
+        document.getElementById('page-url').textContent = currentStatus.url;
+
+        // Update thresholds panel
+        const thresholdsEl = document.getElementById('thresholds');
+        thresholdsEl.innerHTML = Object.entries(currentStatus.thresholds)
+          .map(([key, value]) => `
+            <div class="threshold-item">
+              <div class="threshold-key">${key}</div>
+              <div class="threshold-value">${value}</div>
+            </div>
+          `).join('');
+      } catch (err) {
+        console.error('Failed to load status:', err);
+      }
+    }
+
+    async function confirmAction() {
+      try {
+        const response = await fetch('/api/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+
+        document.getElementById('confirm-banner').style.display = 'none';
+
+        if (data.success) {
+          setTimeout(loadStatus, 100);
+        }
+      } catch (err) {
+        console.error('Failed to confirm:', err);
+      }
+    }
+
+    function cancelConfirm() {
+      document.getElementById('confirm-banner').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
