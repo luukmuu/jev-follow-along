@@ -32,6 +32,28 @@ export TYPESAFE_API_KEY=...          # console → API keys
 | `TYPESAFE_DEFAULT_MODEL` | `jev-latest` |
 | `TYPESAFE_LOG_LEVEL` | `warn` (`debug` logs bodies) |
 
+### Via Vercel AI Gateway
+
+Vercel AI Gateway exposes the same System One API at
+`https://ai-gateway.vercel.sh/typesafe`. The request and response shapes are
+identical, but the auth and the model name differ:
+
+| | TypeSafe direct | Vercel AI Gateway |
+|---|---|---|
+| Endpoint | `https://api.typesafe.ai/v1/systemone` | `https://ai-gateway.vercel.sh/typesafe/v1/systemone` |
+| Key | `TYPESAFE_API_KEY` | `AI_GATEWAY_API_KEY` (`vck_…`) |
+| Model | `jev-latest` | `typesafe-ai/jev` |
+
+```js
+const client = new TypeSafeClient({
+  apiKey: process.env.AI_GATEWAY_API_KEY,
+  baseURL: "https://ai-gateway.vercel.sh/typesafe",
+  defaultModel: "typesafe-ai/jev",
+});
+```
+
+`lib/jev.js` picks this automatically when only `AI_GATEWAY_API_KEY` is set.
+
 ## HTTP
 
 `POST https://api.typesafe.ai/v1/systemone`, with `Authorization: Bearer $TYPESAFE_API_KEY`.

@@ -66,13 +66,22 @@ answer. For each one, is it a `noul`, a `choice` or a `score`?
 - **Compressed docs** (the video's first prompt): your coding assistant writes
   better code when an accurate API summary is inside the project, instead of it
   guessing from memory or browsing each time.
-- Access: typesafe.ai → join the waitlist → console → **API keys**. The console
-  also has a playground where you can try questions by hand.
+- Access, two ways:
+  - **TypeSafe:** typesafe.ai → join the waitlist → console → **API keys**. The
+    console also has a playground where you can try questions by hand. Put the key
+    in `TYPESAFE_API_KEY`.
+  - **Vercel AI Gateway:** a `vck_…` key. Put it in `AI_GATEWAY_API_KEY`. The
+    gateway speaks the same API at `https://ai-gateway.vercel.sh/typesafe`, with
+    the model `typesafe-ai/jev`, so the same SDK works once you change `baseURL`.
+- **Real keys go in `.env`, never in `.env.example`.** `.env.example` is committed
+  and shared. If you paste a key there, GitHub's secret scanning blocks the
+  commit. If a key ever does get committed, revoke it and create a new one.
 
 💬 **Prompt**
 ```text
 Create a Node.js (20+) project with ES modules. Install @typesafe-ai/sdk, express and dotenv.
-Create .env.example with TYPESAFE_API_KEY and ANTHROPIC_API_KEY, and a .gitignore that
+Create .env.example with TYPESAFE_API_KEY, AI_GATEWAY_API_KEY (Vercel) and ANTHROPIC_API_KEY
+(all empty), and a .gitignore that
 excludes node_modules and .env.
 
 Then read the Jev documentation (https://docs.typesafe.ai, and the @typesafe-ai/sdk README and
@@ -113,7 +122,9 @@ Read docs/jev-compressed.md. Create lib/jev.js exporting createJev(), which retu
 { mode, ask(state, questions) }. ask() calls client.systemOne and returns the answers plus
 usage and latencyMs. Re-export the choice/noul/score helpers from the SDK.
 
-If TYPESAFE_API_KEY is missing or JEV_MOCK=1, use an offline mock instead. Write lib/mock-jev.js
+Pick the backend from the environment: TYPESAFE_API_KEY → TypeSafe directly;
+AI_GATEWAY_API_KEY → Vercel AI Gateway (same SDK, baseURL https://ai-gateway.vercel.sh/typesafe,
+model typesafe-ai/jev); neither, or JEV_MOCK=1 → an offline mock. Write lib/mock-jev.js
 as a fetch() implementation passed to TypeSafeClient's `fetch` option. It answers
 POST /v1/systemone in the exact response format, scoring options by word overlap between the
 state and each label's description (softmax for choice/score, sigmoid for noul). Explain in a
