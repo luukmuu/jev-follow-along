@@ -365,7 +365,7 @@ setup, keys, and one command per project. Then commit.
 | 0 Concepts | ✅ this guide |
 | 1 Setup + compressed docs | ✅ done |
 | 2 Shared Jev helper + mock | ✅ done, real Jev confirmed working via OpenRouter (`npm run check`) |
-| 3 Voice browser | 🟡 brain (`decide.js`) + browser control done; server and dashboard next |
+| 3 Voice browser | ✅ done: working by voice with real Jev (OpenRouter), 300–600 ms per decision, `isCommand` tuned to 0.7 |
 | 4 Memory | ⬜ next |
 | 5 YouTube predictor | ⬜ next |
 | 6 Tests + README | ⬜ next |
