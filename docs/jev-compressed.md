@@ -32,6 +32,24 @@ export TYPESAFE_API_KEY=...          # console → API keys
 | `TYPESAFE_DEFAULT_MODEL` | `jev-latest` |
 | `TYPESAFE_LOG_LEVEL` | `warn` (`debug` logs bodies) |
 
+### Via OpenRouter
+
+OpenRouter serves Jev with the same System One API at
+`POST https://openrouter.ai/api/v1/systemone` (prepaid credits, $0.042 per
+million input tokens, output free, 32K context).
+
+```js
+const client = new TypeSafeClient({
+  apiKey: process.env.OPENROUTER_API_KEY,     // sk-or-…
+  baseURL: "https://openrouter.ai/api",
+  defaultModel: "typesafe/jev-1.13",          // some docs write "jev-1.13"
+});
+```
+
+OpenRouter also returns `id`, `provider` and `usage.cost`. There is also an
+alpha endpoint, `POST https://openrouter.ai/api/alpha/decisions`, which this
+repo doesn't use.
+
 ### Via Vercel AI Gateway
 
 Vercel AI Gateway exposes the same System One API at

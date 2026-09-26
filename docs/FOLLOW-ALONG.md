@@ -70,6 +70,9 @@ answer. For each one, is it a `noul`, a `choice` or a `score`?
   - **TypeSafe:** typesafe.ai → join the waitlist → console → **API keys**. The
     console also has a playground where you can try questions by hand. Put the key
     in `TYPESAFE_API_KEY`.
+  - **OpenRouter:** an `sk-or-…` key from openrouter.ai/keys, plus prepaid
+    credits. Put it in `OPENROUTER_API_KEY`. OpenRouter serves the same API at
+    `https://openrouter.ai/api/v1/systemone`, with the model `typesafe/jev-1.13`.
   - **Vercel AI Gateway:** a `vck_…` key. Put it in `AI_GATEWAY_API_KEY`. The
     gateway speaks the same API at `https://ai-gateway.vercel.sh/typesafe`, with
     the model `typesafe-ai/jev`, so the same SDK works once you change `baseURL`.
@@ -80,7 +83,7 @@ answer. For each one, is it a `noul`, a `choice` or a `score`?
 💬 **Prompt**
 ```text
 Create a Node.js (20+) project with ES modules. Install @typesafe-ai/sdk, express and dotenv.
-Create .env.example with TYPESAFE_API_KEY, AI_GATEWAY_API_KEY (Vercel) and ANTHROPIC_API_KEY
+Create .env.example with TYPESAFE_API_KEY, OPENROUTER_API_KEY, AI_GATEWAY_API_KEY (Vercel) and ANTHROPIC_API_KEY
 (all empty), and a .gitignore that
 excludes node_modules and .env.
 
@@ -123,6 +126,7 @@ Read docs/jev-compressed.md. Create lib/jev.js exporting createJev(), which retu
 usage and latencyMs. Re-export the choice/noul/score helpers from the SDK.
 
 Pick the backend from the environment: TYPESAFE_API_KEY → TypeSafe directly;
+OPENROUTER_API_KEY → OpenRouter (same SDK, baseURL https://openrouter.ai/api, model typesafe/jev-1.13);
 AI_GATEWAY_API_KEY → Vercel AI Gateway (same SDK, baseURL https://ai-gateway.vercel.sh/typesafe,
 model typesafe-ai/jev); neither, or JEV_MOCK=1 → an offline mock. Write lib/mock-jev.js
 as a fetch() implementation passed to TypeSafeClient's `fetch` option. It answers
