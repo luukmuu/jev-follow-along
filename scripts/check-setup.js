@@ -23,6 +23,9 @@ try {
   console.error("\n❌ The call failed.");
   if (/allowlist|egress/i.test(error.message)) {
     console.error("   A network proxy blocked the request (not a key problem). Allow the host in your network settings.");
+  } else if (/credit card|billing|payment|credits/i.test(error.message)) {
+    console.error("   Your key works, but the account needs billing set up (e.g. a card on file to unlock free credits).");
+    console.error("   Open the link in the details below, add a card, then run `npm run check` again.");
   } else if (error instanceof AuthenticationError || error instanceof PermissionDeniedError) {
     console.error("   The key was rejected. Check it's copied completely into .env, with no quotes or spaces,");
     console.error("   and that it's under the right name (vck_… keys go in AI_GATEWAY_API_KEY).");

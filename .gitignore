@@ -1,5 +1,8 @@
 node_modules/
 .env
+# editor backups of .env (e.g. nano writes .env.save) can contain your keys
+.env.*
+!.env.example
 projects/03-youtube/data/*.json
 !projects/03-youtube/data/channels.example.json
 .DS_Store
